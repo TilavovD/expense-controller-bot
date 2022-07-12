@@ -10,7 +10,7 @@ from tgbot.handlers.utils.info import extract_user_data_from_update
 from tgbot.models import User
 from tgbot.handlers.onboarding import keyboards
 
-ORDER, CART, PLOV, SALADS, CONTACT_US, FEEDBACK = range(6)
+ORDER, CART, PLOV, PLOV_DETAIL, SALADS, SALAD_DETAIL,  CONTACT_US, FEEDBACK = range(8)
 
 def command_start(update: Update, context: CallbackContext) -> None:
     u, created = User.get_user_and_created(update, context)
@@ -60,9 +60,13 @@ def order_salad(update: Update, context: CallbackContext) -> None:
                               reply_markup=keyboards.make_keyboard_for_salad())
     return SALADS
 
+def plov_details(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text(text="Samarqand Osh Butun\n\nNarxi: 37950.00 so'm\n\nMol go'shti , zig'ir yog'i, piyoz, yuqori sifatli lazer, sariq va qizil sabzi, mayiz, 1 dona qalampir, 1 dona bedana tuxum", reply_markup=keyboards.make_keyboard_for_quantity())
+    return PLOV_DETAIL
 
-
-
+def salad_details(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text(text="Salad\n\nNarxi: 37950.00 so'm\n\nMol go'shti , zig'ir yog'i, piyoz, yuqori sifatli lazer, sariq va qizil sabzi, mayiz, 1 dona qalampir, 1 dona bedana tuxum", reply_markup=keyboards.make_keyboard_for_quantity())
+    return SALAD_DETAIL
 
 
 
