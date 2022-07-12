@@ -6,11 +6,11 @@ import logging
 from typing import Dict
 
 import telegram.error
-from telegram import Bot, Update, BotCommand
+from telegram import Bot, Update, BotCommand, ReplyKeyboardRemove   
 from telegram.ext import (
     Updater, Dispatcher, Filters,
     CommandHandler, MessageHandler,
-    CallbackQueryHandler, ConversationHandler
+    CallbackQueryHandler, ConversationHandler, CallbackContext, 
 )
 
 from dtb.celery import app  # event processing in async mode
@@ -31,7 +31,23 @@ def setup_dispatcher(dp):
     Adding handlers for events from Telegram
     """
     
+    logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+)
+
+    logger = logging.getLogger(__name__)
+    
     ORDER, CART, PLOV, SALADS = range(4)
+    
+    def cancel(update: Update, context: CallbackContext) -> int:
+        """Cancels and ends the conversation."""
+        user = update.message.from_user
+        logger.info("User %s canceled the conversation.", user.first_name)
+        update.message.reply_text(
+        'Bye! I hope we can talk again some day.', reply_markup=ReplyKeyboardRemove()
+    )
+
+        return ConversationHandler.END
     
     #Conversation_handler_starts
     conv_handler = ConversationHandler(
@@ -56,7 +72,7 @@ def setup_dispatcher(dp):
 
             ],
         },
-        fallbacks=[CommandHandler('cancel', onboarding_handlers.cancel)],
+        fallbacks=[CommandHandler('cancel', cancel)],
     )
 
     dp.add_handler(conv_handler)

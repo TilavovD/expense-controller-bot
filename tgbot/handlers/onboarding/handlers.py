@@ -46,15 +46,7 @@ def back_to_salad(update: Update, context: CallbackContext) -> None:
 
 
 
-def cancel(update: Update, context: CallbackContext) -> int:
-    """Cancels and ends the conversation."""
-    user = update.message.from_user
-    logger.info("User %s canceled the conversation.", user.first_name)
-    update.message.reply_text(
-        'Bye! I hope we can talk again some day.', reply_markup=ReplyKeyboardRemove()
-    )
 
-    return ConversationHandler.END
 
 
 
