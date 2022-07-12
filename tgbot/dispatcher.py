@@ -32,7 +32,7 @@ def setup_dispatcher(dp):
     """
   
     
-    ORDER, CART, PLOV, SALADS, CONTACT_US, FEEDBACK = range(6)   
+    ORDER, CART, PLOV, PLOV_DETAIL, SALADS, SALAD_DETAIL, CONTACT_US, FEEDBACK,  = range(8)   
    
         
     
@@ -63,11 +63,23 @@ def setup_dispatcher(dp):
                    ],
             
             PLOV: [
+                MessageHandler(Filters.text("Samarqand Osh Butun"), onboarding_handlers.plov_details),
+                MessageHandler(Filters.text("Samarqand Osh 0.7"), onboarding_handlers.plov_details),
                 MessageHandler(Filters.text("⬅️ Ortga"), onboarding_handlers.order)
+            ],
+             PLOV_DETAIL: [
+                MessageHandler(Filters.text("⬅️ Ortga"), onboarding_handlers.order_plov)
             ],
             SALADS: [
+                MessageHandler(Filters.text("Achchiq-chuchuk"), onboarding_handlers.salad_details),
+                MessageHandler(Filters.text("Chimcha"), onboarding_handlers.salad_details),
                 MessageHandler(Filters.text("⬅️ Ortga"), onboarding_handlers.order)
             ],
+            SALAD_DETAIL: [
+                MessageHandler(Filters.text("⬅️ Ortga"), onboarding_handlers.order_salad)
+            ],
+            
+           
         },
         fallbacks=[],
         allow_reentry =  True

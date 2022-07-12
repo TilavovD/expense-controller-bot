@@ -27,7 +27,7 @@ def make_keyboard_for_start_command() -> ReplyKeyboardMarkup:
 
 def make_keyboard_for_plov() -> ReplyKeyboardMarkup:
     buttons = [
-        
+        ["Samarqand Osh Butun", "Samarqand Osh 0.7"],
         ["⬅️ Ortga"]
     ]
 
@@ -35,7 +35,7 @@ def make_keyboard_for_plov() -> ReplyKeyboardMarkup:
 
 def make_keyboard_for_salad() -> ReplyKeyboardMarkup:
     buttons = [
-        
+        ["Achchiq-chuchuk", "Chimcha"],
         ["⬅️ Ortga"]
     ]
 
@@ -57,4 +57,11 @@ def make_keyboard_for_feedback() -> ReplyKeyboardMarkup:
         ["Asosiyga qaytish"]
     ]
 
+    return ReplyKeyboardMarkup(buttons, resize_keyboard=True)
+
+def make_keyboard_for_quantity():
+    buttons = []
+    for i in range(1,10,3):
+        buttons.append([i, i+1, i+2])
+    buttons.append(["⬅️ Ortga"])
     return ReplyKeyboardMarkup(buttons, resize_keyboard=True)
