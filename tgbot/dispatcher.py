@@ -30,26 +30,11 @@ def setup_dispatcher(dp):
     """
     Adding handlers for events from Telegram
     """
+  
     
-    logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
-)
-
-    logger = logging.getLogger(__name__)
-    
-    
-    ORDER, CART, PLOV, SALADS, CONTACT_US, FEEDBACK = range(6)
-    
-    
-    def cancel(update: Update, context: CallbackContext) -> int:
-        """Cancels and ends the conversation."""
-        user = update.message.from_user
-        logger.info("User %s canceled the conversation.", user.first_name)
-        update.message.reply_text(
-        'Bye! I hope we can talk again some day.', reply_markup=ReplyKeyboardRemove()
-    )
-
-        return ConversationHandler.END
+    ORDER, CART, PLOV, SALADS, CONTACT_US, FEEDBACK = range(6)   
+   
+        
     
     #Conversation_handler_starts
     conv_handler = ConversationHandler(
@@ -67,28 +52,24 @@ def setup_dispatcher(dp):
                 MessageHandler(Filters.text("Asosiyga qaytish"), onboarding_handlers.back_to_main)
                 ],
             CART: [
-                MessageHandler(Filters.text("Asosiyga qaytish"), onboarding_handlers.back_to_main)
-                   
+                MessageHandler(Filters.text("Asosiyga qaytish"), onboarding_handlers.back_to_main)                   
                    ],
             
             CONTACT_US: [
-                MessageHandler(Filters.text("Asosiyga qaytish"), onboarding_handlers.back_to_main)
-                   
+                MessageHandler(Filters.text("Asosiyga qaytish"), onboarding_handlers.back_to_main)                   
                    ],
             FEEDBACK: [
-                MessageHandler(Filters.text("Asosiyga qaytish"), onboarding_handlers.back_to_main)
-                   
+                MessageHandler(Filters.text("Asosiyga qaytish"), onboarding_handlers.back_to_main)                   
                    ],
             
             PLOV: [
-                MessageHandler(Filters.text("⬅️ Ortga"), onboarding_handlers.order),
-
+                MessageHandler(Filters.text("⬅️ Ortga"), onboarding_handlers.order)
             ],
             SALADS: [
-                MessageHandler(Filters.text("⬅️ Ortga"), onboarding_handlers.order),
+                MessageHandler(Filters.text("⬅️ Ortga"), onboarding_handlers.order)
             ],
         },
-        fallbacks=[CommandHandler('cancel', cancel)],
+        fallbacks=[],
         allow_reentry =  True
     )
 
