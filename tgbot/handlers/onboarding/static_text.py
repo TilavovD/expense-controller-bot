@@ -5,3 +5,5 @@ unlock_secret_room = "Congratulations! You've opened a secret room👁‍🗨. T
            "<b>24h active</b>: {active_24}"
 github_button_text = "GitHub"
 secret_level_button_text = "Secret level🗝"
+
+

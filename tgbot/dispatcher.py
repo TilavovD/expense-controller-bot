@@ -10,7 +10,7 @@ from telegram import Bot, Update, BotCommand
 from telegram.ext import (
     Updater, Dispatcher, Filters,
     CommandHandler, MessageHandler,
-    CallbackQueryHandler,
+    CallbackQueryHandler, ConversationHandler
 )
 
 from dtb.celery import app  # event processing in async mode
@@ -30,9 +30,40 @@ def setup_dispatcher(dp):
     """
     Adding handlers for events from Telegram
     """
-    # onboarding
-    dp.add_handler(CommandHandler("start", onboarding_handlers.command_start))
+    
+    ORDER, CART, PLOV, SALADS = range(4)
+    
+    #Conversation_handler_starts
+    conv_handler = ConversationHandler(
+        entry_points=[CommandHandler('start', onboarding_handlers.command_start)],
+        states={
+            ORDER: [
+                MessageHandler(Filters.text("🛍 Buyurtma berish"), onboarding_handlers.order),
+                MessageHandler(Filters.text("Asosiyga qaytish"), onboarding_handlers.back_to_main)
+                ],
+            CART: [MessageHandler(Filters.text("📥 Savatcha"), onboarding_handlers.cart),
+                   MessageHandler(Filters.text("Asosiyga qaytish"), onboarding_handlers.back_to_main)
+                   
+                   ],
+            PLOV: [
+                CommandHandler('plov', onboarding_handlers.order_plov),
+                MessageHandler(Filters.text("⬅️ Ortga"), onboarding_handlers.back_to_plov),
 
+            ],
+            SALADS: [
+                CommandHandler('salad', onboarding_handlers.order_salad),
+                MessageHandler(Filters.text("⬅️ Ortga"), onboarding_handlers.back_to_salad),
+
+            ],
+        },
+        fallbacks=[CommandHandler('cancel', onboarding_handlers.cancel)],
+    )
+
+    dp.add_handler(conv_handler)
+    
+    # onboarding
+    # dp.add_handler(CommandHandler("start", onboarding_handlers.command_start))
+    
     # admin commands
     dp.add_handler(CommandHandler("admin", admin_handlers.admin))
     dp.add_handler(CommandHandler("stats", admin_handlers.stats))
@@ -60,6 +91,10 @@ def setup_dispatcher(dp):
 
     # handling errors
     dp.add_error_handler(error.send_stacktrace_to_tg_chat)
+    
+    
+    
+    
 
     # EXAMPLES FOR HANDLERS
     # dp.add_handler(MessageHandler(Filters.text, <function_handler>))
