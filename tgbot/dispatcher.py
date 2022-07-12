@@ -37,7 +37,9 @@ def setup_dispatcher(dp):
 
     logger = logging.getLogger(__name__)
     
-    ORDER, CART, PLOV, SALADS = range(4)
+    
+    ORDER, CART, PLOV, SALADS, CONTACT_US, FEEDBACK = range(6)
+    
     
     def cancel(update: Update, context: CallbackContext) -> int:
         """Cancels and ends the conversation."""
@@ -51,28 +53,43 @@ def setup_dispatcher(dp):
     
     #Conversation_handler_starts
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', onboarding_handlers.command_start)],
+        entry_points=[
+            CommandHandler('start', onboarding_handlers.command_start),
+            MessageHandler(Filters.text("🛍 Buyurtma berish"), onboarding_handlers.order),
+            MessageHandler(Filters.text("☎️ Biz bilan aloqa"), onboarding_handlers.contact_us),
+            MessageHandler(Filters.text("✍️ Fikr bildirish"), onboarding_handlers.feedback)
+            ],
         states={
             ORDER: [
-                MessageHandler(Filters.text("🛍 Buyurtma berish"), onboarding_handlers.order),
+                MessageHandler(Filters.text("📥 Savatcha"), onboarding_handlers.cart),             
+                MessageHandler(Filters.text('Samarqand Osh'), onboarding_handlers.order_plov),
+                MessageHandler(Filters.text('Salatlar'), onboarding_handlers.order_salad),     
                 MessageHandler(Filters.text("Asosiyga qaytish"), onboarding_handlers.back_to_main)
                 ],
-            CART: [MessageHandler(Filters.text("📥 Savatcha"), onboarding_handlers.cart),
-                   MessageHandler(Filters.text("Asosiyga qaytish"), onboarding_handlers.back_to_main)
+            CART: [
+                MessageHandler(Filters.text("Asosiyga qaytish"), onboarding_handlers.back_to_main)
                    
                    ],
+            
+            CONTACT_US: [
+                MessageHandler(Filters.text("Asosiyga qaytish"), onboarding_handlers.back_to_main)
+                   
+                   ],
+            FEEDBACK: [
+                MessageHandler(Filters.text("Asosiyga qaytish"), onboarding_handlers.back_to_main)
+                   
+                   ],
+            
             PLOV: [
-                CommandHandler('plov', onboarding_handlers.order_plov),
-                MessageHandler(Filters.text("⬅️ Ortga"), onboarding_handlers.back_to_plov),
+                MessageHandler(Filters.text("⬅️ Ortga"), onboarding_handlers.order),
 
             ],
             SALADS: [
-                CommandHandler('salad', onboarding_handlers.order_salad),
-                MessageHandler(Filters.text("⬅️ Ortga"), onboarding_handlers.back_to_salad),
-
+                MessageHandler(Filters.text("⬅️ Ortga"), onboarding_handlers.order),
             ],
         },
         fallbacks=[CommandHandler('cancel', cancel)],
+        allow_reentry =  True
     )
 
     dp.add_handler(conv_handler)

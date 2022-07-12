@@ -12,10 +12,35 @@ def make_keyboard_for_start_command() -> ReplyKeyboardMarkup:
 
     return ReplyKeyboardMarkup(buttons, resize_keyboard=True)
 
+def make_keyboard_for_plov() -> ReplyKeyboardMarkup:
+    buttons = [
+        
+        ["⬅️ Ortga"]
+    ]
+
+    return ReplyKeyboardMarkup(buttons, resize_keyboard=True)
+
+def make_keyboard_for_salad() -> ReplyKeyboardMarkup:
+    buttons = [
+        
+        ["⬅️ Ortga"]
+    ]
+
+    return ReplyKeyboardMarkup(buttons, resize_keyboard=True)
+
 def make_keyboard_for_order() -> ReplyKeyboardMarkup:
     buttons = [
         ["📥 Savatcha"],
         ["Samarqand Osh", "Salatlar"],
+        ["Asosiyga qaytish"]
+    ]
+
+    return ReplyKeyboardMarkup(buttons, resize_keyboard=True)
+
+def make_keyboard_for_feedback() -> ReplyKeyboardMarkup:
+    buttons = [
+        ["Hammasi zo'r"],
+        ["Chidasa bo'ladi"],
         ["Asosiyga qaytish"]
     ]
 
