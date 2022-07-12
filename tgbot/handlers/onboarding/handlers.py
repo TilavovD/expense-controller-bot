@@ -1,14 +1,17 @@
 
 import datetime
+from math import prod
 
 from django.utils import timezone
-from telegram import ParseMode, Update
+from telegram import ParseMode, Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext, ConversationHandler
 
 from tgbot.handlers.onboarding import static_text
 from tgbot.handlers.utils.info import extract_user_data_from_update
 from tgbot.models import User
 from tgbot.handlers.onboarding import keyboards
+
+from cart.models import Cart
 
 ORDER, CART, PLOV, SALADS, CONTACT_US, FEEDBACK = range(6)
 
@@ -30,8 +33,20 @@ def order(update: Update, context: CallbackContext) -> None:
     return ORDER
     
 def cart(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text(text="Savatchaga xush kelibsiz",
-                              reply_markup=keyboards.make_keyboard_for_order())
+    cart_products = Cart.objects.all()
+    text = "Sizning savatchangiz bo'sh"
+    
+    if cart_products:
+        
+        print("if ni ichiga kiryapti")
+        print(f"cart_products----{cart_products}")
+        text = "Sizning savatchangizda: \n"
+        reply_markup, text, sum = keyboards.make_keyboard_for_cart(cart_products, text)            
+        text += f"\n\n Umumiy summa: {sum}"
+    
+    
+    
+    update.message.reply_text(text=text, reply_markup=reply_markup)
     return ORDER
 
 

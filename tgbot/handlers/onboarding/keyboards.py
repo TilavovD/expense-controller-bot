@@ -1,8 +1,21 @@
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
+from telegram import   ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 
 from tgbot.handlers.onboarding.manage_data import SECRET_LEVEL_BUTTON
-from tgbot.handlers.onboarding.static_text import github_button_text, secret_level_button_text
 
+
+def make_keyboard_for_cart(products, text):
+    sum = 0
+    buttons = []
+    for product in products:
+            print(f"product-------->{product.product.title}")
+            text += f"\n {product.product.title} \n {product.quantity} x {product.product.price} = {product.get_total_price(product)}"
+            sum+=product.get_total_price(product)
+            buttons.append([
+        InlineKeyboardButton(product.product.title),
+    ])
+    
+
+    return InlineKeyboardMarkup(buttons), text, sum
 
 def make_keyboard_for_start_command() -> ReplyKeyboardMarkup:
     buttons = [
