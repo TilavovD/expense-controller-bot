@@ -11,13 +11,9 @@ from tgbot.handlers.utils.info import extract_user_data_from_update
 from tgbot.models import User
 from tgbot.handlers.onboarding import keyboards
 
-<<<<<<< HEAD
 from cart.models import Cart
 
-ORDER, CART, PLOV, SALADS, CONTACT_US, FEEDBACK = range(6)
-=======
 ORDER, CART, PLOV, PLOV_DETAIL, SALADS, SALAD_DETAIL,  CONTACT_US, FEEDBACK = range(8)
->>>>>>> 2185e865314fbd8107a379af3edfd08d7971e6ff
 
 def command_start(update: Update, context: CallbackContext) -> None:
     u, created = User.get_user_and_created(update, context)
