@@ -34,21 +34,40 @@ def order(update: Update, context: CallbackContext) -> None:
     
 def cart(update: Update, context: CallbackContext) -> None:
     cart_products = Cart.objects.all()
-    text = "Sizning savatchangiz bo'sh"
-    
-    if cart_products:
-        
-        print("if ni ichiga kiryapti")
-        print(f"cart_products----{cart_products}")
+    text = "Sizning savatchangiz bo'sh"    
+    if cart_products:        
         text = "Sizning savatchangizda: \n"
         reply_markup, text, sum = keyboards.make_keyboard_for_cart(cart_products, text)            
-        text += f"\n\n Umumiy summa: {sum}"
-    
-    
-    
+        text += f"\n\n Umumiy summa: {sum}" 
     update.message.reply_text(text=text, reply_markup=reply_markup)
     return ORDER
 
+def edit_cart_objects(update: Update, context: CallbackContext):
+    query = update.callback_query
+    data = update.callback_query.data.split("-")
+    type = data[1]
+    product_id = data[2]
+    product = Cart.objects.get(id = product_id)
+    
+    cart_products = Cart.objects.all()
+    if type=="increase":
+        product.quantity+=1
+        product.save()
+    elif type=="decrease":
+        product.quantity-=1
+        product.save()
+    elif type=="delete":
+        product.delete()
+    elif type=="product":
+        pass
+        
+    text = "Sizning savatchangizda: \n"
+    reply_markup, text, sum = keyboards.make_keyboard_for_cart(cart_products, text)            
+    text += f"\n\n Umumiy summa: {sum}"
+
+    query.edit_message_text(text=text, reply_markup=reply_markup)
+
+    
 
 def contact_us(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(text="Agar sizda savollar bo'lsa bizga telefon qilishingiz mumkin: +99898 368 7875",

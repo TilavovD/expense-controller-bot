@@ -7,12 +7,18 @@ def make_keyboard_for_cart(products, text):
     sum = 0
     buttons = []
     for product in products:
-            print(f"product-------->{product.product.title}")
+            
             text += f"\n {product.product.title} \n {product.quantity} x {product.product.price} = {product.get_total_price(product)}"
             sum+=product.get_total_price(product)
             buttons.append([
-        InlineKeyboardButton(product.product.title),
+        InlineKeyboardButton(product.product.title, callback_data=f"cart-product-{product.id}"),
     ])
+            buttons.append(
+                [InlineKeyboardButton("➖", callback_data=f"cart-decrease-{product.id}"),
+                 InlineKeyboardButton("❌", callback_data=f"cart-delete-{product.id}"),
+                 InlineKeyboardButton("➕", callback_data=f"cart-increase-{product.id}")
+                 ]
+            )
     
 
     return InlineKeyboardMarkup(buttons), text, sum
