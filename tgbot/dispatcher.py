@@ -79,7 +79,10 @@ def setup_dispatcher(dp):
             CommandHandler('start', onboarding_handlers.command_start),
             MessageHandler(Filters.text("🛍 Buyurtma berish"), onboarding_handlers.order),
             MessageHandler(Filters.text("☎️ Biz bilan aloqa"), onboarding_handlers.contact_us),
-            MessageHandler(Filters.text("✍️ Fikr bildirish"), onboarding_handlers.feedback)
+            MessageHandler(Filters.text("✍️ Fikr bildirish"), onboarding_handlers.feedback),
+            MessageHandler(Filters.text("Asosiyga qaytish"), onboarding_handlers.back_to_main)
+            
+            
             ],
         states={
             ORDER: [
