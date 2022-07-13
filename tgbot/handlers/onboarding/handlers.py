@@ -100,6 +100,7 @@ def order_salad(update: Update, context: CallbackContext) -> None:
     return SALADS
 
 def product_details(update: Update, context: CallbackContext) -> None:
+    
     product = Product.objects.get(title=update.message.text)
     Cart.objects.create(product=product, user_id = extract_user_data_from_update(update)['user_id'])
     update.message.reply_text(text=f"{product.title}\n\nNarxi: {product.price} so'm\n\n{product.content}", reply_markup=keyboards.make_keyboard_for_quantity())
