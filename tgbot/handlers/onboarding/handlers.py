@@ -39,7 +39,11 @@ def cart(update: Update, context: CallbackContext) -> None:
         text = "Sizning savatchangizda: \n"
         reply_markup, text, sum = keyboards.make_keyboard_for_cart(cart_products, text)            
         text += f"\n\n Umumiy summa: {sum}" 
-    update.message.reply_text(text=text, reply_markup=reply_markup)
+        update.message.reply_text(text=text, reply_markup=reply_markup)
+    else:
+        update.message.reply_text(text=text)
+        
+    
     return ORDER
 
 def edit_cart_objects(update: Update, context: CallbackContext):
