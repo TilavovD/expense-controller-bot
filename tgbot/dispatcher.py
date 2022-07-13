@@ -32,7 +32,7 @@ def setup_dispatcher(dp):
     """
   
     
-    ORDER, CART, PLOV, PLOV_DETAIL, SALADS, SALAD_DETAIL, CONTACT_US, FEEDBACK,  = range(8)   
+    ORDER, CART, PLOV, PRODUCT_DETAIL, SALADS, CONTACT_US, FEEDBACK,  = range(7)   
    
         
     
@@ -46,29 +46,29 @@ def setup_dispatcher(dp):
     
     
     # admin commands
-    dp.add_handler(CommandHandler("admin", admin_handlers.admin))
-    dp.add_handler(CommandHandler("stats", admin_handlers.stats))
-    dp.add_handler(CommandHandler('export_users', admin_handlers.export_users))
+    # dp.add_handler(CommandHandler("admin", admin_handlers.admin))
+    # dp.add_handler(CommandHandler("stats", admin_handlers.stats))
+    # dp.add_handler(CommandHandler('export_users', admin_handlers.export_users))
 
     # location
-    dp.add_handler(CommandHandler("ask_location", location_handlers.ask_for_location))
-    dp.add_handler(MessageHandler(Filters.location, location_handlers.location_handler))
+    # dp.add_handler(CommandHandler("ask_location", location_handlers.ask_for_location))
+    # dp.add_handler(MessageHandler(Filters.location, location_handlers.location_handler))
 
-    # secret level
-    dp.add_handler(CallbackQueryHandler(onboarding_handlers.secret_level, pattern=f"^{SECRET_LEVEL_BUTTON}"))
+    # # secret level
+    # dp.add_handler(CallbackQueryHandler(onboarding_handlers.secret_level, pattern=f"^{SECRET_LEVEL_BUTTON}"))
 
-    # broadcast message
-    dp.add_handler(
-        MessageHandler(Filters.regex(rf'^{broadcast_command}(/s)?.*'), broadcast_handlers.broadcast_command_with_message)
-    )
-    dp.add_handler(
-        CallbackQueryHandler(broadcast_handlers.broadcast_decision_handler, pattern=f"^{CONFIRM_DECLINE_BROADCAST}")
-    )
+    # # broadcast message
+    # dp.add_handler(
+    #     MessageHandler(Filters.regex(rf'^{broadcast_command}(/s)?.*'), broadcast_handlers.broadcast_command_with_message)
+    # )
+    # dp.add_handler(
+    #     CallbackQueryHandler(broadcast_handlers.broadcast_decision_handler, pattern=f"^{CONFIRM_DECLINE_BROADCAST}")
+    # )
 
-    # files
-    dp.add_handler(MessageHandler(
-        Filters.animation, files.show_file_id,
-    ))
+    # # files
+    # dp.add_handler(MessageHandler(
+    #     Filters.animation, files.show_file_id,
+    # ))
 
     # handling errors
     dp.add_error_handler(error.send_stacktrace_to_tg_chat)
@@ -103,22 +103,20 @@ def setup_dispatcher(dp):
                    ],
             
             PLOV: [
-                MessageHandler(Filters.text("Samarqand Osh Butun"), onboarding_handlers.plov_details),
-                MessageHandler(Filters.text("Samarqand Osh 0.7"), onboarding_handlers.plov_details),
+                MessageHandler(Filters.text("Samarqand Osh Butun"), onboarding_handlers.product_details),
+                MessageHandler(Filters.text("Samarqand Osh 0.7"), onboarding_handlers.product_details),
                 MessageHandler(Filters.text("⬅️ Ortga"), onboarding_handlers.order)
             ],
-             PLOV_DETAIL: [
-                MessageHandler(Filters.text("⬅️ Ortga"), onboarding_handlers.order_plov)
+             PRODUCT_DETAIL: [
+                MessageHandler(Filters.regex("^(1|2|3|4|5|6|7|8|9)$"), onboarding_handlers.count_quantity),
+                MessageHandler(Filters.text("⬅️ Ortga"), onboarding_handlers.order)
             ],
             SALADS: [
-                MessageHandler(Filters.text("Achchiq-chuchuk"), onboarding_handlers.salad_details),
-                MessageHandler(Filters.text("Chimcha"), onboarding_handlers.salad_details),
+                MessageHandler(Filters.text("Achchiq-chuchuk"), onboarding_handlers.product_details),
+                MessageHandler(Filters.text("Chimcha"), onboarding_handlers.product_details),
                 MessageHandler(Filters.text("⬅️ Ortga"), onboarding_handlers.order)
             ],
-            SALAD_DETAIL: [
-                MessageHandler(Filters.text("⬅️ Ortga"), onboarding_handlers.order_salad)
-            ],
-            
+                 
            
         },
         fallbacks=[],

@@ -12,8 +12,9 @@ from tgbot.models import User
 from tgbot.handlers.onboarding import keyboards
 
 from cart.models import Cart
+from product.models import Product
 
-ORDER, CART, PLOV, PLOV_DETAIL, SALADS, SALAD_DETAIL,  CONTACT_US, FEEDBACK = range(8)
+ORDER, CART, PLOV, PRODUCT_DETAIL, SALADS, CONTACT_US, FEEDBACK = range(7)
 
 def command_start(update: Update, context: CallbackContext) -> None:
     u, created = User.get_user_and_created(update, context)
@@ -94,13 +95,18 @@ def order_salad(update: Update, context: CallbackContext) -> None:
                               reply_markup=keyboards.make_keyboard_for_salad())
     return SALADS
 
-def plov_details(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text(text="Samarqand Osh Butun\n\nNarxi: 37950.00 so'm\n\nMol go'shti , zig'ir yog'i, piyoz, yuqori sifatli lazer, sariq va qizil sabzi, mayiz, 1 dona qalampir, 1 dona bedana tuxum", reply_markup=keyboards.make_keyboard_for_quantity())
-    return PLOV_DETAIL
+def product_details(update: Update, context: CallbackContext) -> None:
+    product = Product.objects.get(title=update.message.text)
+    Cart.objects.create(product=product, user_id = extract_user_data_from_update(update)['user_id'])
+    update.message.reply_text(text=f"{product.title}\n\nNarxi: {product.price} so'm\n\n{product.content}", reply_markup=keyboards.make_keyboard_for_quantity())
+    return PRODUCT_DETAIL
 
-def salad_details(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text(text="Salad\n\nNarxi: 37950.00 so'm\n\nMol go'shti , zig'ir yog'i, piyoz, yuqori sifatli lazer, sariq va qizil sabzi, mayiz, 1 dona qalampir, 1 dona bedana tuxum", reply_markup=keyboards.make_keyboard_for_quantity())
-    return SALAD_DETAIL
+
+
+def count_quantity(update: Update, context: CallbackContext) -> None:
+    cart = Cart.objects.get(user_id = extract_user_data_from_update(update)['user_id'])
+    cart.quantity = update.message.text
+    
 
 
 
