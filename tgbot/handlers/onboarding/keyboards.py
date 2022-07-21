@@ -1,73 +1,36 @@
 from telegram import   ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 
 from tgbot.handlers.onboarding.manage_data import SECRET_LEVEL_BUTTON
-
-
-def make_keyboard_for_cart(products, text):
-    sum = 0
-    buttons = []
-    for product in products:
-            
-            text += f"\n {product.product.title} \n {product.quantity} x {product.product.price} = {product.get_total_price(product)}"
-            sum+=product.get_total_price(product)
-            buttons.append([
-        InlineKeyboardButton(product.product.title, callback_data=f"cart-product-{product.id}"),
-    ])
-            buttons.append(
-                [InlineKeyboardButton("➖", callback_data=f"cart-decrease-{product.id}"),
-                 InlineKeyboardButton("❌", callback_data=f"cart-delete-{product.id}"),
-                 InlineKeyboardButton("➕", callback_data=f"cart-increase-{product.id}")
-                 ]
-            )
-    
-
-    return InlineKeyboardMarkup(buttons), text, sum
+DEPOZIT = "Depozit"
+XARAJAT = "Xarajat"
+XISOBOT = "Xisobot"
+BACK = "⬅️ Ortga"
 
 def make_keyboard_for_start_command() -> ReplyKeyboardMarkup:
     buttons = [
-        ["☎️ Biz bilan aloqa","🛍 Buyurtma berish"],
-        ["✍️ Fikr bildirish"]
+        [DEPOZIT,XARAJAT],
+        [XISOBOT]
     ]
 
     return ReplyKeyboardMarkup(buttons, resize_keyboard=True)
 
-def make_keyboard_for_plov() -> ReplyKeyboardMarkup:
+def make_keyboard_for_xisobot_command() -> ReplyKeyboardMarkup:
     buttons = [
-        ["Samarqand Osh Butun", "Samarqand Osh 0.7"],
-        ["⬅️ Ortga"]
+        ["Depozitlar","Xarajatlar"],
+        [BACK]
     ]
 
     return ReplyKeyboardMarkup(buttons, resize_keyboard=True)
 
-def make_keyboard_for_salad() -> ReplyKeyboardMarkup:
+def make_keyboard_for_xisobot_command2() -> ReplyKeyboardMarkup:
     buttons = [
-        ["Achchiq-chuchuk", "Chimcha"],
-        ["⬅️ Ortga"]
+        ["Bugungi","Umumiy"],
+        [BACK]
     ]
 
     return ReplyKeyboardMarkup(buttons, resize_keyboard=True)
 
-def make_keyboard_for_order() -> ReplyKeyboardMarkup:
-    buttons = [
-        ["📥 Savatcha"],
-        ["Samarqand Osh", "Salatlar"],
-        ["Asosiyga qaytish"]
-    ]
 
-    return ReplyKeyboardMarkup(buttons, resize_keyboard=True)
 
-def make_keyboard_for_feedback() -> ReplyKeyboardMarkup:
-    buttons = [
-        ["Hammasi zo'r"],
-        ["Chidasa bo'ladi"],
-        ["Asosiyga qaytish"]
-    ]
 
-    return ReplyKeyboardMarkup(buttons, resize_keyboard=True)
 
-def make_keyboard_for_quantity():
-    buttons = []
-    for i in range(1,10,3):
-        buttons.append([i, i+1, i+2])
-    buttons.append(["⬅️ Ortga"])
-    return ReplyKeyboardMarkup(buttons, resize_keyboard=True)

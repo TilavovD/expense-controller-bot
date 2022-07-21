@@ -3,7 +3,7 @@ import datetime
 from math import prod
 
 from django.utils import timezone
-from telegram import ParseMode, Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import ParseMode, ReplyKeyboardMarkup, Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext, ConversationHandler
 
 from tgbot.handlers.onboarding import static_text
@@ -11,11 +11,10 @@ from tgbot.handlers.utils.info import extract_user_data_from_update
 from tgbot.models import User
 from tgbot.handlers.onboarding import keyboards
 
-from cart.models import Cart
-from product.models import Product
+from depozit.models import Depozit
+from xarajat.models import Xarajat
 
-ORDER, CART, PLOV, PRODUCT_DETAIL, SALADS, CONTACT_US, FEEDBACK = range(7)
-
+DEPOSIT_QUESTION, DEPOSIT_PRICE, XARAJAT_QUESTION, XARAJAT_PRICE, XISOBOTLAR, XISOBOT_BUGUN, XISOBOT_UMUMIY = range(7)
 def command_start(update: Update, context: CallbackContext) -> None:
     u, created = User.get_user_and_created(update, context)
 
@@ -28,91 +27,125 @@ def command_start(update: Update, context: CallbackContext) -> None:
                               reply_markup=keyboards.make_keyboard_for_start_command())
     return ConversationHandler.END
 
-def order(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text(text="Buyurtma qilish uchun quyidagilardan birini tanlang",
-                              reply_markup=keyboards.make_keyboard_for_order())
-    return ORDER
+def depozit_comment_qustion(update:Update, context: CallbackContext):
+    update.message.reply_text(text="Depozit manbasini kiriting: ")
+    return DEPOSIT_QUESTION
+
+def xarajat_comment_qustion(update:Update, context: CallbackContext):
+    update.message.reply_text(text="Qayerga ishlatganingiz haqida izoh kiriting: ")
+    return XARAJAT_QUESTION
     
-def cart(update: Update, context: CallbackContext) -> None:
-    cart_products = Cart.objects.all()
-    text = "Sizning savatchangiz bo'sh"    
-    if cart_products:        
-        text = "Sizning savatchangizda: \n"
-        reply_markup, text, sum = keyboards.make_keyboard_for_cart(cart_products, text)            
-        text += f"\n\n Umumiy summa: {sum}" 
-        update.message.reply_text(text=text, reply_markup=reply_markup)
-    else:
-        update.message.reply_text(text=text)
+def depozit_comment(update:Update, context: CallbackContext):
+    manba = update.message.text
+    Depozit.objects.create(comment=manba, user_id=update.message.chat_id)
+    update.message.reply_text(text="Summani kiriting (UZS): ")
+    
+    print(manba)
+    return DEPOSIT_PRICE
+
+def xarajat_comment(update:Update, context: CallbackContext):
+    izoh = update.message.text
+    Xarajat.objects.create(comment=izoh, user_id=update.message.chat_id)
+    update.message.reply_text(text="Summani kiriting (UZS): ")
+    
+    print(izoh)
+    return XARAJAT_PRICE
+    
+def depozit_price(update:Update, context: CallbackContext):
+    price = update.message.text
+    try:
+        price=int(price)
+    except:
+        update.message.reply_text("Price must be integer")
+        update.message.reply_text(text="Summani kiriting (UZS): ")
+        return DEPOSIT_PRICE
+    depozit = Depozit.objects.latest("created_at")
+    depozit.price = price
+    depozit.save()
+    update.message.reply_text(text="Depozit saqlandi. Davom etamizmi?!", reply_markup=keyboards.make_keyboard_for_start_command())
+
+
+def xarajat_price(update:Update, context: CallbackContext):
+    price = update.message.text
+    try:
+        price=int(price)
+    except:
+        update.message.reply_text("Summa butun son bo'lishi kerak")
+        update.message.reply_text(text="Summani kiriting (UZS): ")
+        return XARAJAT_PRICE
+
+    xarajat = Xarajat.objects.latest("created_at")
+    xarajat.price = price
+    xarajat.save()
+    update.message.reply_text(text="Xarajat saqlandi. Davom etamizmi?!", reply_markup=keyboards.make_keyboard_for_start_command())
+
+def xisobot_bugun(update:Update, context: CallbackContext):
+    update.message.reply_text(text="Bo'limni tanlang:",
+        reply_markup=keyboards.make_keyboard_for_xisobot_command())
+    return XISOBOT_BUGUN
+
+def xisobot_umumiy(update:Update, context: CallbackContext):
+    update.message.reply_text(text="Bo'limni tanlang:",
+        reply_markup=keyboards.make_keyboard_for_xisobot_command())
+    return XISOBOT_UMUMIY
+
+def depozit_xisobot_all(update:Update, context: CallbackContext):
+    deposits = Depozit.objects.all()
+    price = 0
+    text = "Umumiy depozitlar: \n\n"
+    for deposit in deposits:
+        text+=f"{str(deposit.comment).capitalize()} - {deposit.price} so'm\n"
+        price+=deposit.price
+    text+=f"\n\nUmumiy summa: {price} so'm"
+    update.message.reply_text(text)
+def xarajat_xisobot_all(update:Update, context: CallbackContext):
+    xarajatlar = Xarajat.objects.all()
+    price = 0
+    text = "Umumiy xarajatlar: \n\n"
+    for xarajat in xarajatlar:
+        text+=f"{str(xarajat.comment).capitalize()} - {xarajat.price} so'm\n"
+        price+=xarajat.price
+    text+=f"\n\nUmumiy summa: {price} so'm"
+    update.message.reply_text(text)
+
+def depozit_xisobot_bugun(update:Update, context: CallbackContext):
+    depozits = Depozit.objects.filter(date=datetime.date.today()).all()
+    price = 0
+    text = "Bugungi depozitlar: \n\n"
+    for depozit in depozits:
+        text+=f"{str(depozit.comment).capitalize()} - {depozit.price} so'm |{depozit.created_at.time().strftime('%H:%M')}\n"
+        price+=depozit.price
+
         
-    
-    return ORDER
+    text+=f"\n\nUmumiy summa: {price} so'm"
+    update.message.reply_text(text)
+def xarajat_xisobot_bugun(update:Update, context: CallbackContext):
+    xarajatlar = Xarajat.objects.filter(date=datetime.date.today()).all()
+    price = 0
+    text = "Bugungi xarajatlar: \n\n"
+    for xarajat in xarajatlar:
+        text+=f"{str(xarajat.comment).capitalize()} - {xarajat.price} so'm | {xarajat.created_at.time().hour}:{xarajat.created_at.time().minute}\n"
+        price+=xarajat.price
 
-def edit_cart_objects(update: Update, context: CallbackContext):
-    query = update.callback_query
-    data = update.callback_query.data.split("-")
-    type = data[1]
-    product_id = data[2]
-    product = Cart.objects.get(id = product_id)
-    
-    cart_products = Cart.objects.all()
-    if type=="increase":
-        product.quantity+=1
-        product.save()
-    elif type=="decrease":
-        product.quantity-=1
-        product.save()
-    elif type=="delete":
-        product.delete()
-    elif type=="product":
-        pass
         
-    text = "Sizning savatchangizda: \n"
-    reply_markup, text, sum = keyboards.make_keyboard_for_cart(cart_products, text)            
-    text += f"\n\n Umumiy summa: {sum}"
+    text+=f"\n\nUmumiy summa: {price} so'm"
+    update.message.reply_text(text)
 
-    query.edit_message_text(text=text, reply_markup=reply_markup)
+def asosiy_sahifaga_qaytish(update:Update, context: CallbackContext):
+    update.message.reply_text(text="Hisob-kitob ishlarini davom ettiramizmi?", reply_markup=keyboards.make_keyboard_for_start_command())
+
+def xisobot_tanlovi(update:Update, context: CallbackContext):
+    update.message.reply_text(text="Bo'limni tanlang:", reply_markup=keyboards.make_keyboard_for_xisobot_command2())
+    return XISOBOTLAR
+
+def xisobot_tanlovi_bugun(update:Update, context: CallbackContext):
+    update.message.reply_text(text="Bo'limni tanlang:", reply_markup=keyboards.make_keyboard_for_xisobot_command())
+
+def xisobot_tanlovi_umumiy(update:Update, context: CallbackContext):
+    update.message.reply_text(text="Bo'limni tanlang:", reply_markup=keyboards.make_keyboard_for_xisobot_command())
+
 
     
-
-def contact_us(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text(text="Agar sizda savollar bo'lsa bizga telefon qilishingiz mumkin: +99898 368 7875",
-                              reply_markup=keyboards.make_keyboard_for_start_command())
-    return ConversationHandler.END
-
-def feedback(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text(text="SamOshni tanlaganingiz uchun rahmat.",
-                              reply_markup=keyboards.make_keyboard_for_feedback())
-    return FEEDBACK
-
-def back_to_main(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text(text="Davom etamizmi?",
-                              reply_markup=keyboards.make_keyboard_for_start_command())
-    return ConversationHandler.END
-
-def order_plov(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text(text="Oshni tanlash menyusi",
-                              reply_markup=keyboards.make_keyboard_for_plov())
-    return PLOV
-
-def order_salad(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text(text="Oshni tanlash menyusi",
-                              reply_markup=keyboards.make_keyboard_for_salad())
-    return SALADS
-
-def product_details(update: Update, context: CallbackContext) -> None:
-    
-    product = Product.objects.get(title=update.message.text)
-    Cart.objects.create(product=product, user_id = extract_user_data_from_update(update)['user_id'])
-    update.message.reply_photo(product.product_photo,caption=f"{product.title}\n\nNarxi: {product.price} so'm\n\n{product.content}", reply_markup=keyboards.make_keyboard_for_quantity())
-    return PRODUCT_DETAIL
-
-
-
-def count_quantity(update: Update, context: CallbackContext) -> None:
-    cart = Cart.objects.get(user_id = extract_user_data_from_update(update)['user_id'])
-    cart.quantity = update.message.text
-    
-
 
 
 

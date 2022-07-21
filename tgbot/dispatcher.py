@@ -1,6 +1,3 @@
-"""
-    Telegram event handlers
-"""
 import sys
 import logging
 from typing import Dict
@@ -24,52 +21,13 @@ from tgbot.handlers.broadcast_message import handlers as broadcast_handlers
 from tgbot.handlers.onboarding.manage_data import SECRET_LEVEL_BUTTON
 from tgbot.handlers.broadcast_message.manage_data import CONFIRM_DECLINE_BROADCAST
 from tgbot.handlers.broadcast_message.static_text import broadcast_command
-
+from tgbot.handlers.onboarding.keyboards import DEPOZIT, XARAJAT, XISOBOT, BACK
 
 def setup_dispatcher(dp):
     """
     Adding handlers for events from Telegram
     """
-  
-    
-    ORDER, CART, PLOV, PRODUCT_DETAIL, SALADS, CONTACT_US, FEEDBACK,  = range(7)   
-   
-        
-    
-    # onboarding
-    # dp.add_handler(CommandHandler("start", onboarding_handlers.command_start))
-    
-    
-    #cart-edit-handler
-    dp.add_handler(CallbackQueryHandler(onboarding_handlers.edit_cart_objects, pattern=r"cart-"))
-    
-    
-    
-    # admin commands
-    # dp.add_handler(CommandHandler("admin", admin_handlers.admin))
-    # dp.add_handler(CommandHandler("stats", admin_handlers.stats))
-    # dp.add_handler(CommandHandler('export_users', admin_handlers.export_users))
-
-    # location
-    # dp.add_handler(CommandHandler("ask_location", location_handlers.ask_for_location))
-    # dp.add_handler(MessageHandler(Filters.location, location_handlers.location_handler))
-
-    # # secret level
-    # dp.add_handler(CallbackQueryHandler(onboarding_handlers.secret_level, pattern=f"^{SECRET_LEVEL_BUTTON}"))
-
-    # # broadcast message
-    # dp.add_handler(
-    #     MessageHandler(Filters.regex(rf'^{broadcast_command}(/s)?.*'), broadcast_handlers.broadcast_command_with_message)
-    # )
-    # dp.add_handler(
-    #     CallbackQueryHandler(broadcast_handlers.broadcast_decision_handler, pattern=f"^{CONFIRM_DECLINE_BROADCAST}")
-    # )
-
-    # # files
-    # dp.add_handler(MessageHandler(
-    #     Filters.animation, files.show_file_id,
-    # ))
-
+    DEPOSIT_QUESTION, DEPOSIT_PRICE, XARAJAT_QUESTION, XARAJAT_PRICE, XISOBOTLAR, XISOBOT_BUGUN, XISOBOT_UMUMIY = range(7)
     # handling errors
     dp.add_error_handler(error.send_stacktrace_to_tg_chat)
     
@@ -77,46 +35,41 @@ def setup_dispatcher(dp):
     conv_handler = ConversationHandler(
         entry_points=[
             CommandHandler('start', onboarding_handlers.command_start),
-            MessageHandler(Filters.text("🛍 Buyurtma berish"), onboarding_handlers.order),
-            MessageHandler(Filters.text("☎️ Biz bilan aloqa"), onboarding_handlers.contact_us),
-            MessageHandler(Filters.text("✍️ Fikr bildirish"), onboarding_handlers.feedback),
-            MessageHandler(Filters.text("Asosiyga qaytish"), onboarding_handlers.back_to_main)
-            
-            
+            MessageHandler(Filters.text(DEPOZIT), onboarding_handlers.depozit_comment_qustion),  
+            MessageHandler(Filters.text(XARAJAT), onboarding_handlers.xarajat_comment_qustion),
+            MessageHandler(Filters.text(XISOBOT), onboarding_handlers.xisobot_tanlovi),           
             ],
         states={
-            ORDER: [
-                MessageHandler(Filters.text("📥 Savatcha"), onboarding_handlers.cart),             
-                MessageHandler(Filters.text('Samarqand Osh'), onboarding_handlers.order_plov),
-                MessageHandler(Filters.text('Salatlar'), onboarding_handlers.order_salad),     
-                MessageHandler(Filters.text("Asosiyga qaytish"), onboarding_handlers.back_to_main)
+            DEPOSIT_QUESTION: [
+                MessageHandler(Filters.text & ~Filters.text(BACK) & ~Filters.command, onboarding_handlers.depozit_comment),
+            ],
+            DEPOSIT_PRICE: [
+                MessageHandler(Filters.text & ~Filters.text(BACK) & ~Filters.command, onboarding_handlers.depozit_price),
+
+                ],  
+            XARAJAT_QUESTION: [
+                MessageHandler(Filters.text & ~Filters.text(BACK) & ~Filters.command, onboarding_handlers.xarajat_comment),
+            ],
+            XARAJAT_PRICE: [
+                MessageHandler(Filters.text & ~Filters.text(BACK) & ~Filters.command, onboarding_handlers.xarajat_price),
+
                 ],
-            CART: [
-                MessageHandler(Filters.text("Asosiyga qaytish"), onboarding_handlers.back_to_main)                   
-                   ],
-            
-            CONTACT_US: [
-                MessageHandler(Filters.text("Asosiyga qaytish"), onboarding_handlers.back_to_main)                   
-                   ],
-            FEEDBACK: [
-                MessageHandler(Filters.text("Asosiyga qaytish"), onboarding_handlers.back_to_main)                   
-                   ],
-            
-            PLOV: [
-                MessageHandler(Filters.text("Samarqand Osh Butun"), onboarding_handlers.product_details),
-                MessageHandler(Filters.text("Samarqand Osh 0.7"), onboarding_handlers.product_details),
-                MessageHandler(Filters.text("⬅️ Ortga"), onboarding_handlers.order)
-            ],
-             PRODUCT_DETAIL: [
-                MessageHandler(Filters.regex("^(1|2|3|4|5|6|7|8|9)$"), onboarding_handlers.count_quantity),
-                MessageHandler(Filters.text("⬅️ Ortga"), onboarding_handlers.order)
-            ],
-            SALADS: [
-                MessageHandler(Filters.text("Achchiq-chuchuk"), onboarding_handlers.product_details),
-                MessageHandler(Filters.text("Chimcha"), onboarding_handlers.product_details),
-                MessageHandler(Filters.text("⬅️ Ortga"), onboarding_handlers.order)
-            ],
-                 
+            XISOBOTLAR: [
+                MessageHandler(Filters.text("Bugungi"), onboarding_handlers.xisobot_bugun),  
+                MessageHandler(Filters.text("Umumiy"), onboarding_handlers.xisobot_umumiy),
+                MessageHandler(Filters.text(BACK), onboarding_handlers.asosiy_sahifaga_qaytish),
+                 ],  
+            XISOBOT_BUGUN: [
+                MessageHandler(Filters.text("Depozitlar"), onboarding_handlers.depozit_xisobot_bugun),  
+                MessageHandler(Filters.text("Xarajatlar"), onboarding_handlers.xarajat_xisobot_bugun),
+                MessageHandler(Filters.text(BACK), onboarding_handlers.asosiy_sahifaga_qaytish),
+                 ],  
+            XISOBOT_UMUMIY: [
+                MessageHandler(Filters.text("Depozitlar"), onboarding_handlers.depozit_xisobot_all),  
+                MessageHandler(Filters.text("Xarajatlar"), onboarding_handlers.xarajat_xisobot_all),
+                MessageHandler(Filters.text(BACK), onboarding_handlers.asosiy_sahifaga_qaytish),
+                 ], 
+                                   
            
         },
         fallbacks=[],
@@ -125,22 +78,6 @@ def setup_dispatcher(dp):
 
     dp.add_handler(conv_handler)
     
-    
-    
-    
-
-    # EXAMPLES FOR HANDLERS
-    # dp.add_handler(MessageHandler(Filters.text, <function_handler>))
-    # dp.add_handler(MessageHandler(
-    #     Filters.document, <function_handler>,
-    # ))
-    # dp.add_handler(CallbackQueryHandler(<function_handler>, pattern="^r\d+_\d+"))
-    # dp.add_handler(MessageHandler(
-    #     Filters.chat(chat_id=int(TELEGRAM_FILESTORAGE_ID)),
-    #     # & Filters.forwarded & (Filters.photo | Filters.video | Filters.animation),
-    #     <function_handler>,
-    # ))
-
     return dp
 
 
