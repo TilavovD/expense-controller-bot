@@ -9,7 +9,6 @@ from .keyboards import keyboard_confirm_decline_broadcasting
 from .static_text import broadcast_command, broadcast_wrong_format, broadcast_no_access, error_with_html, \
     message_is_sent, declined_message_broadcasting
 from tgbot.models import User
-from tgbot.tasks import broadcast_message
 
 
 def broadcast_command_with_message(update: Update, context: CallbackContext):

@@ -1,32 +1,29 @@
-pytz
+pytz==2022.2
 requests
-python-dotenv
+python-dotenv~=0.20.0
 ipython
 
 # Django
-django
-django-timezone-field 
+django==4.0.7
+django-timezone-field
 django-cors-headers
-django-debug-toolbar
+django-debug-toolbar~=3.5.0
 whitenoise
 
 # Django 3.0 async requirements
 gunicorn
 uvicorn
-# uvloop
 httptools
 
 # Databases
 psycopg2-binary
-dj-database-url
+dj-database-url==1.0.0
 
 # Distributed tasks
-celery
-redis
-django-celery-beat
 
 # Telegram
-python-telegram-bot
+python-telegram-bot==13.13
 
-# monitoring
-# sentry-sdk
+
+
+geopy~=2.2.0

@@ -3,7 +3,7 @@ from typing import Union, Optional, Dict, List
 import telegram
 from telegram import MessageEntity, InlineKeyboardButton, InlineKeyboardMarkup
 
-from dtb.settings import TELEGRAM_TOKEN
+from core.settings import TELEGRAM_TOKEN
 from tgbot.models import User
 
 

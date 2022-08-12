@@ -1,36 +1,33 @@
-from telegram import   ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 
-from tgbot.handlers.onboarding.manage_data import SECRET_LEVEL_BUTTON
 DEPOZIT = "Depozit"
 XARAJAT = "Xarajat"
 XISOBOT = "Xisobot"
-BACK = "⬅️ Ortga"
+BACK = "⬅️Ortga"
+
 
 def make_keyboard_for_start_command() -> ReplyKeyboardMarkup:
     buttons = [
-        [DEPOZIT,XARAJAT],
-        [XISOBOT]
+        [DEPOZIT, XARAJAT],
+        [XISOBOT],
     ]
 
     return ReplyKeyboardMarkup(buttons, resize_keyboard=True)
+
 
 def make_keyboard_for_xisobot_command() -> ReplyKeyboardMarkup:
     buttons = [
-        ["Depozitlar","Xarajatlar"],
+        ["Depozitlar", "Xarajatlar"],
         [BACK]
     ]
 
     return ReplyKeyboardMarkup(buttons, resize_keyboard=True)
+
 
 def make_keyboard_for_xisobot_command2() -> ReplyKeyboardMarkup:
     buttons = [
-        ["Bugungi","Umumiy"],
+        ["Bugungi", "Umumiy"],
         [BACK]
     ]
 
     return ReplyKeyboardMarkup(buttons, resize_keyboard=True)
-
-
-
-
-

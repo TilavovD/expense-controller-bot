@@ -6,7 +6,7 @@ import telegram
 from telegram import Update
 from telegram.ext import CallbackContext
 
-from dtb.settings import TELEGRAM_LOGS_CHAT_ID
+from core.settings import TELEGRAM_LOGS_CHAT_ID
 from tgbot.models import User
 
 

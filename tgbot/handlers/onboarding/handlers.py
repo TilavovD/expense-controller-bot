@@ -1,21 +1,18 @@
-
 import datetime
-from math import prod
 
-from django.utils import timezone
-from telegram import ParseMode, ReplyKeyboardMarkup, Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update
 from telegram.ext import CallbackContext, ConversationHandler
 
-from tgbot.handlers.onboarding import static_text
-from tgbot.handlers.utils.info import extract_user_data_from_update
-from tgbot.models import User
-from tgbot.handlers.onboarding import keyboards
-
 from depozit.models import Depozit
+from tgbot.handlers.onboarding import keyboards
+from tgbot.handlers.onboarding import static_text
+from tgbot.models import User
 from xarajat.models import Xarajat
 
-DEPOSIT_QUESTION, DEPOSIT_PRICE, XARAJAT_QUESTION, XARAJAT_PRICE, XISOBOTLAR, XISOBOT_BUGUN, XISOBOT_UMUMIY = range(7)
-def command_start(update: Update, context: CallbackContext) -> None:
+DEPOSIT_QUESTION, DEPOSIT_PRICE, EXPENSE_QUESTION, EXPENSE_PRICE, REPORT, REPORT_TODAY, REPORT_TOTAL = range(7)
+
+
+def command_start(update: Update, context: CallbackContext):
     u, created = User.get_user_and_created(update, context)
 
     if created:
@@ -27,141 +24,146 @@ def command_start(update: Update, context: CallbackContext) -> None:
                               reply_markup=keyboards.make_keyboard_for_start_command())
     return ConversationHandler.END
 
-def depozit_comment_qustion(update:Update, context: CallbackContext):
+
+def deposit_comment_question(update: Update, context: CallbackContext):
     update.message.reply_text(text="Depozit manbasini kiriting: ")
     return DEPOSIT_QUESTION
 
-def xarajat_comment_qustion(update:Update, context: CallbackContext):
-    update.message.reply_text(text="Qayerga ishlatganingiz haqida izoh kiriting: ")
-    return XARAJAT_QUESTION
-    
-def depozit_comment(update:Update, context: CallbackContext):
-    manba = update.message.text
-    Depozit.objects.create(comment=manba, user_id=update.message.chat_id)
+
+def expense_comment_question(update: Update, context: CallbackContext):
+    update.message.reply_text(text="Xarajat uchun izoh kiriting: ")
+    return EXPENSE_QUESTION
+
+
+def deposit_comment(update: Update, context: CallbackContext):
+    comment = update.message.text
+    Depozit.objects.create(comment=comment, user_id=update.message.chat_id)
     update.message.reply_text(text="Summani kiriting (UZS): ")
-    
-    print(manba)
+
     return DEPOSIT_PRICE
 
-def xarajat_comment(update:Update, context: CallbackContext):
-    izoh = update.message.text
-    Xarajat.objects.create(comment=izoh, user_id=update.message.chat_id)
+
+def expense_comment(update: Update, context: CallbackContext):
+    comment = update.message.text
+    Xarajat.objects.create(comment=comment, user_id=update.message.chat_id)
     update.message.reply_text(text="Summani kiriting (UZS): ")
-    
-    print(izoh)
-    return XARAJAT_PRICE
-    
-def depozit_price(update:Update, context: CallbackContext):
+    return EXPENSE_PRICE
+
+
+def deposit_price(update: Update, context: CallbackContext):
     price = update.message.text
     try:
-        price=int(price)
-    except:
-        update.message.reply_text("Price must be integer")
+        price = int(price)
+    except ValueError:
+        update.message.reply_text("Summa xato kiritildi! Iltimos, tekshirib, qaytadan kiriting:")
         update.message.reply_text(text="Summani kiriting (UZS): ")
         return DEPOSIT_PRICE
-    depozit = Depozit.objects.latest("created_at")
-    depozit.price = price
-    depozit.save()
-    update.message.reply_text(text="Depozit saqlandi. Davom etamizmi?!", reply_markup=keyboards.make_keyboard_for_start_command())
+    deposit = Depozit.objects.filter(user_id=update.message.chat_id).last()
+    deposit.price = price
+    deposit.save()
+    update.message.reply_text(text="Depozit saqlandi. Davom etamizmi?!",
+                              reply_markup=keyboards.make_keyboard_for_start_command())
 
 
-def xarajat_price(update:Update, context: CallbackContext):
+def expense_price(update: Update, context: CallbackContext):
     price = update.message.text
     try:
-        price=int(price)
-    except:
-        update.message.reply_text("Summa butun son bo'lishi kerak")
+        price = float(price)
+    except ValueError:
+        update.message.reply_text("Summa xato kiritildi! Iltimos, tekshirib, qaytadan kiriting:")
         update.message.reply_text(text="Summani kiriting (UZS): ")
-        return XARAJAT_PRICE
+        return EXPENSE_PRICE
 
-    xarajat = Xarajat.objects.latest("created_at")
-    xarajat.price = price
-    xarajat.save()
-    update.message.reply_text(text="Xarajat saqlandi. Davom etamizmi?!", reply_markup=keyboards.make_keyboard_for_start_command())
+    expense = Xarajat.objects.filter(user_id=update.message.chat_id).last()
+    expense.price = price
+    expense.save()
+    update.message.reply_text(text="Xarajat saqlandi. Davom etamizmi?!",
+                              reply_markup=keyboards.make_keyboard_for_start_command())
 
-def xisobot_bugun(update:Update, context: CallbackContext):
+
+def report_today(update: Update, context: CallbackContext):
     update.message.reply_text(text="Bo'limni tanlang:",
-        reply_markup=keyboards.make_keyboard_for_xisobot_command())
-    return XISOBOT_BUGUN
+                              reply_markup=keyboards.make_keyboard_for_xisobot_command())
+    return REPORT_TODAY
 
-def xisobot_umumiy(update:Update, context: CallbackContext):
+
+def report_total(update: Update, context: CallbackContext):
     update.message.reply_text(text="Bo'limni tanlang:",
-        reply_markup=keyboards.make_keyboard_for_xisobot_command())
-    return XISOBOT_UMUMIY
+                              reply_markup=keyboards.make_keyboard_for_xisobot_command())
+    return REPORT_TOTAL
 
-def depozit_xisobot_all(update:Update, context: CallbackContext):
-    deposits = Depozit.objects.all()
+
+def deposit_report_total(update: Update, context: CallbackContext):
+    deposits = Depozit.objects.filter(user_id=update.message.chat_id)
     price = 0
     text = "Umumiy depozitlar: \n\n"
     for deposit in deposits:
-        text+=f"{str(deposit.comment).capitalize()} - {deposit.price} so'm\n"
-        price+=deposit.price
-    text+=f"\n\nUmumiy summa: {price} so'm"
+        if deposit.price != 0:
+            text += f"{str(deposit.comment).capitalize()} - {deposit.price} so'm\n"
+            price += deposit.price
+    text += f"\n\nUmumiy summa: {price} so'm"
+    if price == 0:
+        text = 'Sizda depozitlar mavjud emas'
     update.message.reply_text(text)
-def xarajat_xisobot_all(update:Update, context: CallbackContext):
-    xarajatlar = Xarajat.objects.all()
+
+
+def expense_report_total(update: Update, context: CallbackContext):
+    expenses = Xarajat.objects.filter(user_id=update.message.chat_id)
     price = 0
     text = "Umumiy xarajatlar: \n\n"
-    for xarajat in xarajatlar:
-        text+=f"{str(xarajat.comment).capitalize()} - {xarajat.price} so'm\n"
-        price+=xarajat.price
-    text+=f"\n\nUmumiy summa: {price} so'm"
+    for expense in expenses:
+        if expense.price != 0:
+            text += f"{str(expense.comment).capitalize()} - {expense.price} so'm\n"
+            price += expense.price
+    text += f"\n\nUmumiy summa: {price} so'm"
+    if price == 0:
+        text = "Sizda xarajatlar mavjud emas"
     update.message.reply_text(text)
 
-def depozit_xisobot_bugun(update:Update, context: CallbackContext):
-    depozits = Depozit.objects.filter(date=datetime.date.today()).all()
+
+def deposit_report_today(update: Update, context: CallbackContext):
+    deposits = Depozit.objects.filter(user_id=update.message.chat_id, date=datetime.date.today())
     price = 0
     text = "Bugungi depozitlar: \n\n"
-    for depozit in depozits:
-        text+=f"{str(depozit.comment).capitalize()} - {depozit.price} so'm |{depozit.created_at.time().strftime('%H:%M')}\n"
-        price+=depozit.price
+    for deposit in deposits:
+        if deposit.price != 0:
+            text += f"{str(deposit.comment).capitalize()} - {deposit.price} so'm |{deposit.created_at.time().strftime('%H:%M:%S')}\n"
+            price += deposit.price
 
-        
-    text+=f"\n\nUmumiy summa: {price} so'm"
+    text += f"\n\nUmumiy summa: {price} so'm"
+    if price == 0:
+        text = 'Sizda bugungi kun uchun depozitlar mavjud emas'
     update.message.reply_text(text)
-def xarajat_xisobot_bugun(update:Update, context: CallbackContext):
-    xarajatlar = Xarajat.objects.filter(date=datetime.date.today()).all()
+
+
+def expense_report_today(update: Update, context: CallbackContext):
+    expenses = Xarajat.objects.filter(user_id=update.message.chat_id, date=datetime.date.today())
     price = 0
     text = "Bugungi xarajatlar: \n\n"
-    for xarajat in xarajatlar:
-        text+=f"{str(xarajat.comment).capitalize()} - {xarajat.price} so'm | {xarajat.created_at.time().hour}:{xarajat.created_at.time().minute}\n"
-        price+=xarajat.price
+    for expense in expenses:
+        if price != 0:
+            text += f"{str(expense.comment).capitalize()} - {expense.price} so'm | {expense.created_at.time().strftime('%H:%M:%S')}\n"
+            price += expense.price
 
-        
-    text+=f"\n\nUmumiy summa: {price} so'm"
+    text += f"\n\nUmumiy summa: {price} so'm"
+    if price == 0:
+        text = 'Sizda bugungi kun uchun xarajatlar mavjud emas'
     update.message.reply_text(text)
 
-def asosiy_sahifaga_qaytish(update:Update, context: CallbackContext):
-    update.message.reply_text(text="Hisob-kitob ishlarini davom ettiramizmi?", reply_markup=keyboards.make_keyboard_for_start_command())
 
-def xisobot_tanlovi(update:Update, context: CallbackContext):
+def back_to_main(update: Update, context: CallbackContext):
+    update.message.reply_text(text="Hisob-kitob ishlarini davom ettiramizmi?",
+                              reply_markup=keyboards.make_keyboard_for_start_command())
+
+
+def report_choice(update: Update, context: CallbackContext):
     update.message.reply_text(text="Bo'limni tanlang:", reply_markup=keyboards.make_keyboard_for_xisobot_command2())
-    return XISOBOTLAR
+    return REPORT
 
-def xisobot_tanlovi_bugun(update:Update, context: CallbackContext):
+
+def report_choice_today(update: Update, context: CallbackContext):
     update.message.reply_text(text="Bo'limni tanlang:", reply_markup=keyboards.make_keyboard_for_xisobot_command())
 
-def xisobot_tanlovi_umumiy(update:Update, context: CallbackContext):
+
+def report_choice_total(update: Update, context: CallbackContext):
     update.message.reply_text(text="Bo'limni tanlang:", reply_markup=keyboards.make_keyboard_for_xisobot_command())
-
-
-    
-
-
-
-
-def secret_level(update: Update, context: CallbackContext) -> None:
-    # callback_data: SECRET_LEVEL_BUTTON variable from manage_data.py
-    """ Pressed 'secret_level_button_text' after /start command"""
-    user_id = extract_user_data_from_update(update)['user_id']
-    text = static_text.unlock_secret_room.format(
-        user_count=User.objects.count(),
-        active_24=User.objects.filter(updated_at__gte=timezone.now() - datetime.timedelta(hours=24)).count()
-    )
-
-    context.bot.edit_message_text(
-        text=text,
-        chat_id=user_id,
-        message_id=update.callback_query.message.message_id,
-        parse_mode=ParseMode.HTML
-    )
