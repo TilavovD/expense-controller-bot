@@ -1,14 +1,12 @@
 from django.contrib import admin
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
-
-from core.settings import DEBUG
 
 from tgbot.models import Location
 from tgbot.models import User
-from tgbot.forms import BroadcastForm
 
-from tgbot.handlers.broadcast_message.utils import _send_message
+from .models import Expense, Deposit
+
+admin.site.register(Expense)
+admin.site.register(Deposit)
 
 
 @admin.register(User)

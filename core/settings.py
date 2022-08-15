@@ -2,7 +2,6 @@ import logging
 import os
 import sys
 
-import dj_database_url
 import dotenv
 
 from pathlib import Path
@@ -42,8 +41,6 @@ INSTALLED_APPS = [
 
     # local apps
     'tgbot',
-    'depozit',
-    'xarajat',
 
 ]
 
@@ -90,8 +87,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'core.wsgi.application'
-# ASGI_APPLICATION = 'core.asgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
@@ -125,7 +120,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
 USE_TZ = True
-TIME_ZONE = 'Europe/Moscow'
+TIME_ZONE = 'Asia/Tashkent'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
@@ -139,23 +134,14 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "mediafiles")
 
 # -----> CELERY
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379",
-        "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},
-        # "KEY_PREFIX": "lenta",
-    },
-}
-
-# # CELERY
-# BROKER_URL = 'redis://localhost:6379/0'
-# CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-# CELERY_ACCEPT_CONTENT = ["application/json"]
-# CELERY_TASK_SERIALIZER = "json"
-# CELERY_RESULT_SERIALIZER = "json"
-# CELERY_AMQP_TASK_RESULT_EXPIRES = 1000
-# CELERY_TIMEZONE = "Asia/Tashkent"
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django_redis.cache.RedisCache",
+#         "LOCATION": "redis://127.0.0.1:6379",
+#         "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},
+#         # "KEY_PREFIX": "lenta",
+#     },
+# }
 
 
 # -----> TELEGRAM
@@ -168,23 +154,3 @@ if TELEGRAM_TOKEN is None:
     sys.exit(1)
 
 TELEGRAM_LOGS_CHAT_ID = os.getenv("TELEGRAM_LOGS_CHAT_ID", default=None)
-
-# -----> SENTRY
-# import sentry_sdk
-# from sentry_sdk.integrations.django import DjangoIntegration
-# from sentry_sdk.integrations.celery import CeleryIntegration
-# from sentry_sdk.integrations.redis import RedisIntegration
-
-# sentry_sdk.init(
-#     dsn="INPUT ...ingest.sentry.io/ LINK",
-#     integrations=[
-#         DjangoIntegration(),
-#         CeleryIntegration(),
-#         RedisIntegration(),
-#     ],
-#     traces_sample_rate=0.1,
-
-#     # If you wish to associate users to errors (assuming you are using
-#     # django.contrib.auth) you may enable sending PII data.
-#     send_default_pii=True
-# )

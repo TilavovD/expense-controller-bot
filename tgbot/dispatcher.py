@@ -5,7 +5,7 @@ import telegram.error
 from telegram import Bot
 from telegram.ext import (
     Updater, Filters,
-    CommandHandler, MessageHandler, ConversationHandler, Dispatcher,
+    CommandHandler, MessageHandler, ConversationHandler, Dispatcher, CallbackQueryHandler
 )
 
 from core.settings import TELEGRAM_TOKEN
@@ -21,7 +21,8 @@ def setup_dispatcher(dp):
     """
     Adding handlers for events from Telegram
     """
-    DEPOSIT_QUESTION, DEPOSIT_PRICE, EXPENSE_QUESTION, EXPENSE_PRICE, REPORT, REPORT_TODAY, REPORT_TOTAL = range(7)
+    DEPOSIT_QUESTION, DEPOSIT_PRICE, EXPENSE_QUESTION, EXPENSE_PRICE, REPORT, REPORT_TODAY, REPORT_TOTAL, DEPOSIT_DETAIL, \
+    DEPOSIT_DELETE_EDIT, DEPOSIT_EDIT, EXPENSE_DETAIL, EXPENSE_DELETE_EDIT, EXPENSE_EDIT = range(13)
     # handling errors
     dp.add_error_handler(error.send_stacktrace_to_tg_chat)
 
@@ -66,6 +67,18 @@ def setup_dispatcher(dp):
                 MessageHandler(Filters.text("Depozitlar"), onboarding_handlers.deposit_report_total),
                 MessageHandler(Filters.text("Xarajatlar"), onboarding_handlers.expense_report_total),
                 MessageHandler(Filters.text(BACK), onboarding_handlers.back_to_main),
+            ],
+            DEPOSIT_DETAIL: [
+                CallbackQueryHandler(onboarding_handlers.deposit_detail),
+            ],
+            EXPENSE_DETAIL: [
+                CallbackQueryHandler(onboarding_handlers.expense_detail),
+            ],
+            DEPOSIT_DELETE_EDIT: [
+                CallbackQueryHandler(onboarding_handlers.deposit_delete_edit),
+            ],
+            EXPENSE_DELETE_EDIT: [
+                CallbackQueryHandler(onboarding_handlers.expense_delete_edit),
             ],
 
         },

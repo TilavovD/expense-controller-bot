@@ -12,6 +12,25 @@ from tgbot.handlers.utils.info import extract_user_data_from_update
 from utils.models import CreateUpdateTracker, nb, CreateTracker, GetOrNoneManager
 
 
+class BaseModel(models.Model):
+    created_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now_add=True)
+    date = models.DateField(auto_now=True)
+    user_id = models.PositiveBigIntegerField()
+    comment = models.CharField(max_length=64)
+    price = models.PositiveIntegerField(verbose_name="summa (UZS)", default=0)
+
+    def __str__(self) -> str:
+        return f"{self.comment} ({self.price})"
+
+
+class Expense(BaseModel):
+    pass
+
+
+class Deposit(BaseModel):
+    pass
+
 class AdminUserManager(Manager):
     def get_queryset(self):
         return super().get_queryset().filter(is_admin=True)
@@ -93,6 +112,3 @@ class Location(CreateTracker):
             save_data_from_arcgis(latitude=self.latitude, longitude=self.longitude, location_id=self.pk)
         else:
             save_data_from_arcgis.delay(latitude=self.latitude, longitude=self.longitude, location_id=self.pk)
-
-
-
