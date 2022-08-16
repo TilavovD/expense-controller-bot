@@ -70,15 +70,27 @@ def setup_dispatcher(dp):
             ],
             DEPOSIT_DETAIL: [
                 CallbackQueryHandler(onboarding_handlers.deposit_detail),
+                MessageHandler(Filters.text("Depozitlar"), onboarding_handlers.deposit_report_total),
+                MessageHandler(Filters.text("Xarajatlar"), onboarding_handlers.expense_report_total),
+                MessageHandler(Filters.text(BACK), onboarding_handlers.back_to_main),
             ],
             EXPENSE_DETAIL: [
                 CallbackQueryHandler(onboarding_handlers.expense_detail),
+                MessageHandler(Filters.text("Depozitlar"), onboarding_handlers.deposit_report_total),
+                MessageHandler(Filters.text("Xarajatlar"), onboarding_handlers.expense_report_total),
+                MessageHandler(Filters.text(BACK), onboarding_handlers.back_to_main),
             ],
             DEPOSIT_DELETE_EDIT: [
                 CallbackQueryHandler(onboarding_handlers.deposit_delete_edit),
+                MessageHandler(Filters.text("Depozitlar"), onboarding_handlers.deposit_report_total),
+                MessageHandler(Filters.text("Xarajatlar"), onboarding_handlers.expense_report_total),
+                MessageHandler(Filters.text(BACK), onboarding_handlers.back_to_main),
             ],
             EXPENSE_DELETE_EDIT: [
                 CallbackQueryHandler(onboarding_handlers.expense_delete_edit),
+                MessageHandler(Filters.text("Depozitlar"), onboarding_handlers.deposit_report_total),
+                MessageHandler(Filters.text("Xarajatlar"), onboarding_handlers.expense_report_total),
+                MessageHandler(Filters.text(BACK), onboarding_handlers.back_to_main),
             ],
 
         },
