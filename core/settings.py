@@ -37,7 +37,7 @@ INSTALLED_APPS = [
 
     # 3rd party apps
     'debug_toolbar',
-    'django_redis',
+
 
     # local apps
     'tgbot',
@@ -118,7 +118,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
-USE_TZ = True
+
 TIME_ZONE = 'Asia/Tashkent'
 
 # Static files (CSS, JavaScript, Images)
