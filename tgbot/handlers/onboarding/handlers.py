@@ -125,6 +125,7 @@ def expense_report_total(update: Update, context: CallbackContext):
             text += f"{n}. {str(expense.comment).capitalize()} - {expense.price} so'm\n"
             price += expense.price
             keyboard.append([InlineKeyboardButton(str(n), callback_data=expense.id)])
+            n += 1
     text += f"\n\nUmumiy summa: {price} so'm"
     if price == 0:
         text = "Sizda xarajatlar mavjud emas"
@@ -135,7 +136,7 @@ def expense_report_total(update: Update, context: CallbackContext):
 
 
 def deposit_report_today(update: Update, context: CallbackContext):
-    deposits = Expense.objects.filter(user_id=update.message.chat_id, date=datetime.date.today())
+    deposits = Deposit.objects.filter(user_id=update.message.chat_id, date=datetime.date.today())
     price = 0
     text = "Bugungi depozitlar: \n\n"
     for deposit in deposits:
@@ -156,7 +157,7 @@ def expense_report_today(update: Update, context: CallbackContext):
     price = 0
     text = "Bugungi xarajatlar: \n\n"
     for expense in expenses:
-        if price != 0:
+        if expense.price != 0:
             text += f"{str(expense.comment).capitalize()} - {expense.price} so'm | {expense.created_at.time().strftime('%H:%M:%S')}\n"
             price += expense.price
 
